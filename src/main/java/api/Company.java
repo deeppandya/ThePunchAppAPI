@@ -19,8 +19,6 @@ import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 
 import dao.DAO;
-import dao.DAO;
-import schema.CompanySchema;
 import schema.CompanySchema;
 
 @Path("/company")
@@ -98,9 +96,9 @@ public class Company {
 			JsonElement email = jsonobj.get("email");
 			JsonElement emp = jsonobj.get("employees");
 			
-			HashMap<Integer,String> map = new HashMap<Integer,String>();
-			map = (HashMap<Integer,String>)(new Gson()).fromJson(emp.getAsJsonObject(), map.getClass());
-			boolean result = DAO.addEmployee(email.toString(), map);
+			HashMap<String,String> map = new HashMap<String,String>();
+			map = (HashMap<String,String>)(new Gson()).fromJson(emp.getAsJsonObject(), map.getClass());
+			boolean result = DAO.addEmployee(email.getAsString(), map);
 			
 			json.addProperty("data", result);
 		}catch(JsonSyntaxException e){
@@ -126,9 +124,9 @@ public class Company {
 			JsonElement email = jsonobj.get("email");
 			JsonElement task = jsonobj.get("tasks");
 			
-			HashMap<Integer,String> map = new HashMap<Integer,String>();
-			map = (HashMap<Integer,String>)(new Gson()).fromJson(task.getAsJsonObject(), map.getClass());
-			boolean result = DAO.addTask(email.toString(), map);
+			HashMap<String,String> map = new HashMap<String,String>();
+			map = (HashMap<String,String>)(new Gson()).fromJson(task.getAsJsonObject(), map.getClass());
+			boolean result = DAO.addTask(email.getAsString(), map);
 			
 			json.addProperty("data", result);
 		}catch(JsonSyntaxException e){
@@ -137,6 +135,48 @@ public class Company {
 			json.addProperty("error", "invalid input json");
 		}
 		return Response.status(status).entity(json.toString()).build();
+	}
+	
+	@GET
+	@Path("/getEmployee")
+	@Produces("application/json")
+	public Response getEmployeesMap(@QueryParam("email") String email){
+		JsonObject json = new JsonObject();
+		if (email==null){
+			json.addProperty("error", "invalid parameters");
+			return Response.status(400).entity(json.toString()).build();
+		}else{
+			HashMap<String, String> map = DAO.getEmployeesMap(email);
+			if (map == null) {
+				json.addProperty("error", "invalid email");
+				return Response.status(400).entity(json.toString()).build();
+			}
+			else{
+				json.addProperty("employees", new Gson().toJson(map));
+				return Response.ok().entity(new Gson().toJson(map)).build();
+			}
+		} 
+	}
+	
+	@GET
+	@Path("/getTask")
+	@Produces("application/json")
+	public Response getTasksMap(@QueryParam("email") String email){
+		JsonObject json = new JsonObject();
+		if (email==null){
+			json.addProperty("error", "invalid parameters");
+			return Response.status(400).entity(json.toString()).build();
+		}else{
+			HashMap<String, String> map = DAO.getTasksMap(email);
+			if (map == null) {
+				json.addProperty("error", "invalid email");
+				return Response.status(400).entity(json.toString()).build();
+			}
+			else{
+				json.addProperty("tasks", new Gson().toJson(map));
+				return Response.ok().entity(new Gson().toJson(map)).build();
+			}
+		}
 	}
 	
 }

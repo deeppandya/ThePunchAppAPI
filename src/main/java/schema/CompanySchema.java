@@ -11,19 +11,19 @@ public class CompanySchema {
 	private String name;
 	private int isActive;	//1-online, 0-offline
 	private String password;
-	private HashMap<Integer, String> employees = new HashMap<Integer, String>();
-	private HashMap<Integer, String> tasks = new HashMap<Integer, String>();
+	private HashMap<String, String> employees = new HashMap<String, String>();
+	private HashMap<String, String> tasks = new HashMap<String, String>();
 	
-	public HashMap<Integer, String> getEmployees() {
+	public HashMap<String, String> getEmployees() {
 		return employees;
 	}
-	public void setEmployees(HashMap<Integer, String> employees) {
+	public void setEmployees(HashMap<String, String> employees) {
 		this.employees = employees;
 	}
-	public HashMap<Integer, String> getTasks() {
+	public HashMap<String, String> getTasks() {
 		return tasks;
 	}
-	public void setTasks(HashMap<Integer, String> tasks) {
+	public void setTasks(HashMap<String, String> tasks) {
 		this.tasks = tasks;
 	}
 	public int getIsActive() {

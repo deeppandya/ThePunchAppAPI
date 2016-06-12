@@ -109,9 +109,9 @@ public class DAO {
 		}		
 	}
 	
-	public static boolean addTask(String email, Map<Integer, String> taskmap){
+	public static boolean addTask(String email, Map<String, String> taskmap){
 		MongoDatabase db = MongoClientSingleton.getMongoClientInstance();
-		HashMap<Integer, String> tasks =null;
+		HashMap<String, String> tasks =null;
 		try{
 			CompanySchema company = getCompanyByCredentials(email, null);
 			if (company != null) {
@@ -132,14 +132,14 @@ public class DAO {
 		}
 	}
 	
-	public static boolean addEmployee(String email, Map<Integer, String> empmap){
+	public static boolean addEmployee(String email, Map<String, String> empmap){
 		MongoDatabase db = MongoClientSingleton.getMongoClientInstance();
 		
-		HashMap<Integer, String> employees =null;
+		HashMap<String, String> employees =null;
 		try{
 			CompanySchema company = getCompanyByCredentials(email, null);
 			if (company != null) {
-				employees = company.getTasks();
+				employees = company.getEmployees();
 				employees.putAll(empmap);
 				
 				BasicDBObject newDocument = new BasicDBObject();
@@ -156,6 +156,36 @@ public class DAO {
 			return false;
 		}
 		
+	}
+	
+	public static HashMap<String, String> getEmployeesMap(String email){
+		MongoDatabase db = MongoClientSingleton.getMongoClientInstance();
+		try{
+			CompanySchema company = getCompanyByCredentials(email, null);
+			if (company != null) {
+				return company.getEmployees();
+			}else	//invalid credentials
+				return null;
+			
+		}catch(MongoException e){
+			//TODO log error
+			return null;
+		}
+	}
+	
+	public static HashMap<String, String> getTasksMap(String email){
+		MongoDatabase db = MongoClientSingleton.getMongoClientInstance();
+		try{
+			CompanySchema company = getCompanyByCredentials(email, null);
+			if (company != null) {
+				return company.getTasks();
+			}else	//invalid credentials
+				return null;
+			
+		}catch(MongoException e){
+			//TODO log error
+			return null;
+		}
 	}
 	
 }
