@@ -1,13 +1,9 @@
 package api;
 
-import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
-import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import com.google.gson.Gson;
@@ -57,7 +53,7 @@ public class Authentication {
 		
 		if (user!=null){ 
 			DAO.updateIsActive(user.getEmail(), 0);	//1 = not active
-			json.addProperty("success", "Okay");
+			json.addProperty("data", true);
 		}
 		else
 			json.addProperty("error", "invalid user credentials");

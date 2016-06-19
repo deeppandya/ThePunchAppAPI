@@ -1,37 +1,33 @@
 package dao;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.codec.binary.Base64;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.mongodb.BasicDBObject;
-import com.mongodb.Block;
 import com.mongodb.MongoException;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
-import com.mongodb.client.model.Projections;
 
 import constants.TableNameMapping;
 import schema.CompanySchema;
+import schema.EntrySchema;
 
 public class DAO {
 	
-	private static String collection = TableNameMapping.CLASS_TO_TABLENAME_MAPPING.get(CompanySchema.class);
-	
 	public static CompanySchema getCompanyByCredentials(String email, String password){
+		String collection = TableNameMapping.CLASS_TO_TABLENAME_MAPPING.get(CompanySchema.class);
 		MongoDatabase db = MongoClientSingleton.getMongoClientInstance();
 		
 		//String collection = TableNameMapping.CLASS_TO_TABLENAME_MAPPING.get(UserTableSchema.class);
 		
-		HashMap<String, String> querymap = new HashMap();
+		HashMap<String, String> querymap = new HashMap<String, String>();
 		querymap.put("email", email);
 		
 		//If we want to fetch company by just email then password will be null
@@ -60,7 +56,7 @@ public class DAO {
 	}
 	
 	public static boolean checkIfEmailExist(String email){
-		List<String> returnList = new ArrayList<String>();
+		String collection = TableNameMapping.CLASS_TO_TABLENAME_MAPPING.get(CompanySchema.class);
 		MongoDatabase db = MongoClientSingleton.getMongoClientInstance();
 		
 		Bson filter = Filters.eq("email", email);
@@ -83,6 +79,7 @@ public class DAO {
 	}
 	
 	public static boolean insertCompany(CompanySchema user){
+		String collection = TableNameMapping.CLASS_TO_TABLENAME_MAPPING.get(CompanySchema.class);
 		MongoDatabase db = MongoClientSingleton.getMongoClientInstance();
 		try{
 			user.setPassword(CompanySchema.md5(user.getPassword()));
@@ -94,7 +91,21 @@ public class DAO {
 		return true;
 	}
 	
+	public static boolean insertEntry(EntrySchema entry){
+		String collection = TableNameMapping.CLASS_TO_TABLENAME_MAPPING.get(EntrySchema.class);
+		MongoDatabase db = MongoClientSingleton.getMongoClientInstance();
+		try{
+			//user.setPassword(CompanySchema.md5(user.getPassword()));
+			db.getCollection(collection).insertOne(Document.parse(new Gson().toJson(entry)));
+		}catch(MongoException e){
+			//TODO log error	
+			return false;
+		}
+		return true;
+	}
+	
 	public static void updateIsActive(String email, int isActive){
+		String collection = TableNameMapping.CLASS_TO_TABLENAME_MAPPING.get(CompanySchema.class);
 		MongoDatabase db = MongoClientSingleton.getMongoClientInstance();
 		try{
 			
@@ -109,7 +120,8 @@ public class DAO {
 		}		
 	}
 	
-	public static boolean addTask(String email, Map<String, String> taskmap){
+	public static HashMap<String, String> addTask(String email, Map<String, String> taskmap){
+		String collection = TableNameMapping.CLASS_TO_TABLENAME_MAPPING.get(CompanySchema.class);
 		MongoDatabase db = MongoClientSingleton.getMongoClientInstance();
 		HashMap<String, String> tasks =null;
 		try{
@@ -123,16 +135,17 @@ public class DAO {
 				BasicDBObject searchQuery = new BasicDBObject().append("email", email);
 				
 				db.getCollection(collection).updateOne(searchQuery, newDocument);
-				return true;
+				return tasks;
 			}else	//email doesn't exist
-				return false;
+				return null;
 		}catch(MongoException e){
 			//TODO log error
-			return false;
+			return null;
 		}
 	}
 	
-	public static boolean addEmployee(String email, Map<String, String> empmap){
+	public static HashMap<String, String> addEmployee(String email, Map<String, String> empmap){
+		String collection = TableNameMapping.CLASS_TO_TABLENAME_MAPPING.get(CompanySchema.class);
 		MongoDatabase db = MongoClientSingleton.getMongoClientInstance();
 		
 		HashMap<String, String> employees =null;
@@ -147,19 +160,18 @@ public class DAO {
 				BasicDBObject searchQuery = new BasicDBObject().append("email", email);
 				
 				db.getCollection(collection).updateOne(searchQuery, newDocument);
-				return true;
-			}else	//invalid credentials
-				return false;
+				return employees;
+			}else	//email doesn't exist
+				return null;
 			
 		}catch(MongoException e){
 			//TODO log error
-			return false;
+			return null;
 		}
 		
 	}
 	
 	public static HashMap<String, String> getEmployeesMap(String email){
-		MongoDatabase db = MongoClientSingleton.getMongoClientInstance();
 		try{
 			CompanySchema company = getCompanyByCredentials(email, null);
 			if (company != null) {
@@ -174,7 +186,6 @@ public class DAO {
 	}
 	
 	public static HashMap<String, String> getTasksMap(String email){
-		MongoDatabase db = MongoClientSingleton.getMongoClientInstance();
 		try{
 			CompanySchema company = getCompanyByCredentials(email, null);
 			if (company != null) {
@@ -187,5 +198,25 @@ public class DAO {
 			return null;
 		}
 	}
+	
+	/**
+     * Encodes the byte array into base64 string
+     *
+     * @param imageByteArray - byte array
+     * @return String a {@link java.lang.String}
+     */
+    public static String encodeImage(byte[] imageByteArray) {
+        return Base64.encodeBase64URLSafeString(imageByteArray);
+    }
+ 
+    /**
+     * Decodes the base64 string into byte array
+     *
+     * @param imageDataString - a {@link java.lang.String}
+     * @return byte array
+     */
+    public static byte[] decodeImage(String imageDataString) {
+        return Base64.decodeBase64(imageDataString);
+    }
 	
 }

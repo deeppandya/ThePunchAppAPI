@@ -28,10 +28,11 @@ public class Company {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response createCompany(String input){
+		int status=200;
 		JsonObject json = new JsonObject();
 		if (input.equals("")){ 
-			json.addProperty("data", "invalid request");
-			return Response.status(400).entity(json.toString()).build();
+			json.addProperty("error", "invalid request");
+			status = 400;
 		}
 		try{
 			CompanySchema company = new Gson().fromJson(input, CompanySchema.class);
@@ -40,29 +41,30 @@ public class Company {
 				{
 					if(company.getName()==null || company.getPassword()==null  
 							|| company.getEmail()==null || company.getAddress()==null ){
-						json.addProperty("data", "not enough parameters");
-						return Response.status(400).entity(json.toString()).build();
+						json.addProperty("error", "not enough parameters");
+						status = 400;
 					}
 					
-					boolean result = DAO.insertCompany(company);
-					json.addProperty("data", "db insertion error");
-					
-					return ( (result) ? (Response.ok().entity(new Gson().toJson(company)).build()) 
-							: (Response.status(400).entity(json.toString()).build()) );
+					if(DAO.insertCompany(company)){
+						return Response.ok().entity(new Gson().toJson(company)).build();
+					}
+					else{
+						status = 400;
+						json.addProperty("error", "db insertion error");
+					}
 				}else{
-					json.addProperty("data", "company already exists");
-					return Response.status(400).entity(json.toString()).build();
+					json.addProperty("error", "company already exists");
+					status = 400;
 				}
-				
 			}else{
-				json.addProperty("data", "invalid parameters");
-				return Response.status(400).entity(json.toString()).build();
+				json.addProperty("error", "invalid parameters");
+				status = 400;
 			}
-				
 		}catch(Exception e){
-			json.addProperty("data", "json parse exception");
-			return Response.status(400).entity(json.toString()).build();
+			json.addProperty("error", "json parse exception");
+			status = 400;
 		}
+		return Response.status(status).entity(json.toString()).build();
 	}
 	
 	@GET
@@ -98,9 +100,16 @@ public class Company {
 			
 			HashMap<String,String> map = new HashMap<String,String>();
 			map = (HashMap<String,String>)(new Gson()).fromJson(emp.getAsJsonObject(), map.getClass());
-			boolean result = DAO.addEmployee(email.getAsString(), map);
 			
-			json.addProperty("data", result);
+			HashMap<String,String> updatedEmployees;
+			
+			if((updatedEmployees = DAO.addEmployee(email.getAsString(), map)) != null){
+				json.addProperty("data", new Gson().toJson(updatedEmployees));
+			}
+			else{
+				status = 400;
+				json.addProperty("error", "invalid email or exception during insertion");
+			}
 		}catch(JsonSyntaxException e){
 			//TODO log error
 			status = 400;
@@ -126,9 +135,14 @@ public class Company {
 			
 			HashMap<String,String> map = new HashMap<String,String>();
 			map = (HashMap<String,String>)(new Gson()).fromJson(task.getAsJsonObject(), map.getClass());
-			boolean result = DAO.addTask(email.getAsString(), map);
 			
-			json.addProperty("data", result);
+			HashMap<String,String> updatedTasks;
+			if((updatedTasks = DAO.addTask(email.getAsString(), map)) != null)
+				json.addProperty("data", new Gson().toJson(updatedTasks));
+			else{
+				status = 400;
+				json.addProperty("error", "invalid email or exception during insertion");
+			}
 		}catch(JsonSyntaxException e){
 			//TODO log error
 			status = 400;
