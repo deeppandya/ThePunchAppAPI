@@ -3,7 +3,7 @@ package listener;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import dao.MongoClientSingleton;
+import Util.MongoClientSingleton;
 
 public class WherebyServletContextListener implements ServletContextListener {
 

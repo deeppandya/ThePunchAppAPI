@@ -1,4 +1,4 @@
-package dao;
+package Util;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,7 +32,7 @@ public class DAO {
 		
 		//If we want to fetch company by just email then password will be null
 		if (password != null) 
-			querymap.put("password", CompanySchema.md5(password));
+			querymap.put("password", Helper.md5(password));
 		
 		String json = new Gson().toJson(querymap);
 		
@@ -82,7 +82,7 @@ public class DAO {
 		String collection = TableNameMapping.CLASS_TO_TABLENAME_MAPPING.get(CompanySchema.class);
 		MongoDatabase db = MongoClientSingleton.getMongoClientInstance();
 		try{
-			user.setPassword(CompanySchema.md5(user.getPassword()));
+			user.setPassword(Helper.md5(user.getPassword()));
 			db.getCollection(collection).insertOne(Document.parse(new Gson().toJson(user)));
 		}catch(MongoException e){
 			//TODO log error	

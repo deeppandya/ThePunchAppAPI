@@ -38,8 +38,8 @@ import com.mongodb.client.gridfs.model.GridFSUploadOptions;
 import com.mongodb.gridfs.GridFS;
 import com.mongodb.gridfs.GridFSInputFile;
 
-import dao.DAO;
-import dao.MongoClientSingleton;
+import Util.DAO;
+import Util.MongoClientSingleton;
 import schema.CompanySchema;
 import schema.EntrySchema;
 

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="angularjs/angular.min.js"></script>
+<script src="angularjs/angular-cookies.js"></script>
+<script src="angularjs/angular-cookies.min.js"></script>
+<script src="controller/main.js"></script>
+<meta charset="ISO-8859-1">
+<title>Title</title>
+</head>
+<body ng-app="ThePunchAppModule" ng-controller="ThePunchAppController">
+	Hello with index.html
+	<div >
+		First Name: <input type="text" ng-model="firstName">
+		Last Name: <input type="text" ng-model="lastName">
+		
+		<input type="text" ng-model="name" />
+		hello {{name}}
+	</div>
+	<br><br>
+	<div>
+		Email: <input type="text" ng-model="email">
+		Password: <input type="password" ng-model="password">
+		<button ng-click="login()">Login</button>
+		<button ng-click="next()">Next</button>
+		<button ng-click="logout()">Logout</button>
+	</div>
+</body>
+</html>

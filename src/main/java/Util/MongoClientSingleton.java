@@ -1,9 +1,9 @@
-package dao;
+package Util;
 
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoDatabase;
 
-import constants.DatabaseConstants;
+import constants.Constants;
 
 public class MongoClientSingleton {
 	private static MongoClient client = null;
@@ -11,9 +11,9 @@ public class MongoClientSingleton {
 	public static synchronized MongoDatabase getMongoClientInstance() {
 	    try {
 	    	if (client == null) {
-	    		client = new MongoClient(DatabaseConstants.HOST, DatabaseConstants.PORT);
+	    		client = new MongoClient(Constants.HOST, Constants.MONGO_PORT);
 		    }       
-		    return client.getDatabase(DatabaseConstants.DATABASENAME);
+		    return client.getDatabase(Constants.DATABASENAME);
 		} catch (Exception e) {
 			return null;
 		}   
